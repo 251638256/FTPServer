@@ -13,7 +13,7 @@ namespace AdvancedFTPServer
 
         internal string UserName = "WZY";
         internal string StartUpDirectory = FTPServer.CommonPath;
-        internal string CurrentWorkingDirectory = "\\";
+        internal string CurrentWorkingDirectory = "/";
         internal bool IsAuthenticated = false;
         string Password = "123";
 
