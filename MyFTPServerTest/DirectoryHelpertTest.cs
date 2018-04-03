@@ -22,6 +22,8 @@ namespace MyFTPServerTest
 
             string path2 = DirectoryHelper.GetExactPath(@"root/myftppath");
             path2.ShouldBe(@"/root/myftppath/");
+
+
 #endif
 
             Console.WriteLine();
