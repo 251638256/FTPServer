@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Collections;
 using System.Threading;
+using MyFTPServer.Classes;
 
 namespace AdvancedFTPServer
 {
@@ -135,7 +136,7 @@ namespace AdvancedFTPServer
                     switch (Command)
                     {
                         case "CWD":
-                            string dir = GetExactPath(CmdArguments);
+                            string dir = DirectoryHelper.GetExactPath(CmdArguments);
 
                             if (ConnectedUser.ChangeDirectory(dir))
                                 SendMessage("250 CWD command successful.\r\n");
@@ -225,7 +226,7 @@ namespace AdvancedFTPServer
             Socket DataSocket = null;
             try
             {
-                string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+                string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
                 Path = Path.Substring(0, Path.Length - 1);
 
                 if (!ConnectedUser.CanViewHiddenFiles && (File.GetAttributes(Path) & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -278,7 +279,7 @@ namespace AdvancedFTPServer
             }
             Stream FS = null;
 
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
             Path = Path.Substring(0, Path.Length - 1);
 
             try
@@ -329,7 +330,7 @@ namespace AdvancedFTPServer
 
         void DELE(string CmdArguments)
         {
-            string Path = GetExactPath(CmdArguments);
+            string Path = DirectoryHelper.GetExactPath(CmdArguments);
             Path = ConnectedUser.StartUpDirectory + Path.Substring(0, Path.Length - 1);
             try
             {
@@ -371,7 +372,7 @@ namespace AdvancedFTPServer
         {
             if (!ConnectedUser.CanRenameFiles) { SendMessage("550 Access Denied.\r\n"); return; }
 
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
 
             if (Directory.Exists(Path) || File.Exists(Path))
             {
@@ -389,7 +390,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
 
             if (Directory.Exists(Path) || File.Exists(Path))
                 SendMessage("550 File or folder with the same name already exists.\r\n");
@@ -422,7 +423,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
 
             if (Directory.Exists(Path))
             {
@@ -444,7 +445,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
 
             if (Directory.Exists(Path) || File.Exists(Path))
                 SendMessage("550 A file or folder with the same name already exists.\r\n");
@@ -461,7 +462,7 @@ namespace AdvancedFTPServer
 
         void LIST(string CmdArguments)
         {
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
             if (!ConnectedUser.CanViewHiddenFolders && (new DirectoryInfo(Path).Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
             {
                 SendMessage("550 Invalid path specified.\r\n");
@@ -537,7 +538,7 @@ namespace AdvancedFTPServer
 
         void NLST(string CmdArguments)
         {
-            string Path = ConnectedUser.StartUpDirectory + GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
             if (!Directory.Exists(Path))
             {
                 SendMessage("550 Invalid Path.\r\n");
@@ -659,38 +660,6 @@ namespace AdvancedFTPServer
             catch { Disconnect(); }
         }
 
-        string GetExactPath(string Path)
-        {
-            if (Path == null) Path = "";
-
-            string dir = Path.Replace("/", "\\");
-
-            if (!dir.EndsWith("\\")) dir += "\\";
-
-            if (!Path.StartsWith("/")) dir = ConnectedUser.CurrentWorkingDirectory + dir;
-
-            ArrayList pathParts = new ArrayList();
-            dir = dir.Replace("\\\\", "\\");
-            string[] p = dir.Split('\\');
-            pathParts.AddRange(p);
-
-            for (int i = 0; i < pathParts.Count; i++)
-            {
-                if (pathParts[i].ToString() == "..")
-                {
-                    if (i > 0)
-                    {
-                        pathParts.RemoveAt(i - 1);
-                        i--;
-                    }
-
-                    pathParts.RemoveAt(i);
-                    i--;
-                }
-            }
-
-            return dir.Replace("\\\\", "\\");
-        }
 
         Socket GetDataSocket()
         {
