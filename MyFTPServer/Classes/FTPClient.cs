@@ -50,7 +50,7 @@ namespace AdvancedFTPServer
 
         string Rename_FilePath;
 
-        byte[] BufferData = new byte[500];
+        byte[] BufferData = new byte[1024];
 
         internal FTPClient(Socket ClientSocket)
         {
@@ -111,8 +111,10 @@ namespace AdvancedFTPServer
                     if (CmdArguments != null && CmdArguments.Length > 0)
                     {
                         // WHY ??? 为什么在这里发送
+                        string userName = CmdArguments;
+                        ConnectedUser.LoadProfile(userName);
+                        // 向客户端发送这句命令后客户端会马上发送密码信息过来
                         SendMessage("331 Password required!\r\n");
-                        ConnectedUser.LoadProfile(CmdArguments.ToUpper());
                     }
                     CommandExecued = true;
                     break;
@@ -125,22 +127,33 @@ namespace AdvancedFTPServer
 
                     if (ConnectedUser.Authenticate(CmdArguments))
                         SendMessage("230 Authentication Successful\r\n");
-                    else SendMessage("530 Authentication Failed!\r\n");
+                    else
+                        SendMessage("530 Authentication Failed!\r\n");
                     CommandExecued = true;
                     break;
             }
             if (!CommandExecued)
             {
+                // ConnectedUser.IsAuthenticated
                 if (ConnectedUser.IsAuthenticated) { 
-                    Console.WriteLine("命令内容 " + Command);
+                    Console.WriteLine("命令内容 " + Command + "  参数内容 " + CmdArguments);
                     switch (Command)
                     {
                         case "CWD":
-                            string dir = DirectoryHelper.GetExactPath(CmdArguments);
-
+                            // 确定目录是否存在
+                            string dir = DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
                             if (ConnectedUser.ChangeDirectory(dir))
                                 SendMessage("250 CWD command successful.\r\n");
                             else SendMessage("550 System can't find directory '" + dir + "'.\r\n");
+                            break;
+                        case "PWD":
+                            // 确定成功后返回当前工作路径
+                            string msg = "257 \"" + ConnectedUser.CurrentWorkingDirectory.Replace('\\', '/') + "\"\r\n";
+                            SendMessage(msg);
+                            break;
+                        case "LIST":
+                            // 返回当前工作路径中所有的内容
+                            LIST(CmdArguments);
                             break;
 
                         case "CDUP": CDUP(CmdArguments); break;
@@ -157,13 +170,7 @@ namespace AdvancedFTPServer
                         case "RMD": RMD(CmdArguments); break;
                         case "MKD": MKD(CmdArguments); break;
 
-                        case "PWD":
-                            string msg = "257 \"" + ConnectedUser.CurrentWorkingDirectory.Replace('\\', '/') + "\"\r\n";
-                            Console.WriteLine("返回的目录内容是\n");
-                            Console.WriteLine(msg);
-                            SendMessage(msg);
-                            break;
-                        case "LIST": LIST(CmdArguments); break;
+
                         case "NLST": NLST(CmdArguments); break;
                         case "SYST": SendMessage("215 Windows_NT\r\n"); break;
                         case "NOOP": SendMessage("200 OK\r\n"); break;
@@ -462,7 +469,8 @@ namespace AdvancedFTPServer
 
         void LIST(string CmdArguments)
         {
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
             if (!ConnectedUser.CanViewHiddenFolders && (new DirectoryInfo(Path).Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
             {
                 SendMessage("550 Invalid path specified.\r\n");
@@ -525,7 +533,11 @@ namespace AdvancedFTPServer
             {
                 SendMessage("550 Invalid path specified.\r\n");
             }
-            catch
+            catch(UnauthorizedAccessException ex)
+            {
+                SendMessage("426 权限不足.\r\n");
+            }
+            catch (Exception ex)
             {
                 SendMessage("426 Connection closed; transfer aborted.\r\n");
             }

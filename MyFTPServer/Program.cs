@@ -14,15 +14,9 @@ namespace MyFTPServer
 
         static void Main(string[] args)
         {
-
-            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlServer(@"Data Source=192.168.0.60\SQLEXPRESS;Initial Catalog=FTPDatabase;User ID=admin;password=123;Integrated Security=false", c => {
-                c.UseRowNumberForPaging(false);
-            });
-            FTPDBContext fTPDBContext = new FTPDBContext(dbContextOptionsBuilder.Options);
-            fTPDBContext.Database.EnsureCreated();
-            fTPDBContext.Seed();
-
+            //Console.WriteLine("Wating...");
+            //Console.ReadKey();
+            var instance = FtpDbContext.Instance;
 
             string curpath = AppDomain.CurrentDomain.BaseDirectory;
             string configFilePath = Path.Combine(curpath, "mysetting.config");

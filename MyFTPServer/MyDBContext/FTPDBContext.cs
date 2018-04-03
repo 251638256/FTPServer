@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyFTPServer.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +7,24 @@ using System.Text;
 
 namespace MyFTPServer.MyDBContext
 {
-    class FTPDBContext : DbContext
+    class FtpDbContext : DbContext
     {
-        public FTPDBContext(DbContextOptions options) : base(options)
+        public static FtpDbContext Instance;
+
+        static FtpDbContext()
+        {
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            dbContextOptionsBuilder.UseSqlServer(@"Data Source=.;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false", c => {
+                c.UseRowNumberForPaging(false);
+            });
+            FtpDbContext fTPDBContext = new FtpDbContext(dbContextOptionsBuilder.Options);
+            fTPDBContext.Database.EnsureCreated();
+            fTPDBContext.Seed();
+
+            Instance = fTPDBContext;
+        }
+
+        public FtpDbContext(DbContextOptions options) : base(options)
         {
             // Init
         }
@@ -52,7 +68,7 @@ namespace MyFTPServer.MyDBContext
                     CanStoreFolder = true,
                     CanViewHiddenFiles = true,
                     CanViewHiddenFolders = true,
-                    WorkdDirectory = @"\"
+                    WorkdDirectory = Constant.IsUnixOrMacOSX ? "/" : @"c:\"
                 }).State = EntityState.Added;
             }
         }

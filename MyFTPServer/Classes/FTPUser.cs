@@ -1,25 +1,52 @@
+using MyFTPServer.MyDBContext;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 
 namespace AdvancedFTPServer
 {
-    class FTPUser
+    public class FTPUser
     {
         internal bool CanDeleteFiles, CanDeleteFolders, CanRenameFiles,
             CanRenameFolders, CanStoreFiles, CanStoreFolder, CanViewHiddenFiles,
             CanViewHiddenFolders, CanCopyFiles;
 
-        internal string UserName = "WZY";
-        internal string StartUpDirectory = FTPServer.CommonPath;
-        internal string CurrentWorkingDirectory = "/";
-        internal bool IsAuthenticated = false;
-        string Password = "123";
+        //internal string UserName = "WZY";
+        //internal string StartUpDirectory = FTPServer.CommonPath;
+        //internal string CurrentWorkingDirectory = "/";
+        //internal bool IsAuthenticated = false;
+        //string Password = "123";
 
-        internal void LoadProfile(string UserName)
+        internal string UserName = "";
+        internal string StartUpDirectory = @"";
+        internal string CurrentWorkingDirectory = "\\";
+        internal bool IsAuthenticated = false;
+        string Password = "";
+
+        internal void LoadProfile(string userName)
         {
-            CanDeleteFiles = CanDeleteFolders = CanRenameFiles = CanRenameFolders = CanStoreFiles = CanStoreFolder = CanViewHiddenFiles = CanViewHiddenFolders = CanCopyFiles = true;
+            //CanDeleteFiles = CanDeleteFolders = CanRenameFiles = CanRenameFolders = CanStoreFiles = CanStoreFolder = CanViewHiddenFiles = CanViewHiddenFolders = CanCopyFiles = true;
+
+            User user = FtpDbContext.Instance.User.FirstOrDefault(c => c.LoginName == userName);
+            if (user != null)
+            {
+                UserName = user.LoginName;
+                Password = user.Password;
+                StartUpDirectory = user.WorkdDirectory;
+                IsAuthenticated = false;
+                CanDeleteFiles = user.CanDeleteFiles;
+                CanDeleteFolders = user.CanDeleteFolders;
+                CanRenameFiles = user.CanRenameFiles;
+                CanRenameFolders = user.CanRenameFolders;
+                CanStoreFiles = user.CanStoreFiles;
+                CanStoreFolder = user.CanStoreFolder;
+                CanViewHiddenFiles = user.CanViewHiddenFiles;
+                CanViewHiddenFolders = user.CanViewHiddenFolders;
+                CanCopyFiles = user.CanCopyFiles;
+            }
+
             //UserName = "wzy";
             //StartUpDirectory = @"C:\Users\work\Desktop\FTP_Source";
             //IsAuthenticated = true;

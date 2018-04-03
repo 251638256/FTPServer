@@ -28,5 +28,11 @@ namespace MyFTPServerTest
 
             Console.WriteLine();
         }
+
+        [Fact]
+        public void IsUnixOrMacOsTest()
+        {
+            // Ã»·¨²â
+        }
     }
 }
