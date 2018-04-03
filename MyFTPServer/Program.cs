@@ -44,7 +44,7 @@ namespace MyFTPServer
             fTPServer = new FTPServer();
             fTPServer.Start();
 
-            Console.WriteLine("Pree q or Q to exit this application");
+            Console.WriteLine("Press q or Q to exit this application");
             while (true)
             {
                 ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
