@@ -47,14 +47,23 @@ namespace MyFTPServer
             Console.WriteLine("Press q or Q to exit this application");
             while (true)
             {
-                ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
-                if (consoleKeyInfo.KeyChar == 'q' || consoleKeyInfo.KeyChar == 'Q')
+                string con = Console.ReadLine().ToLower();
+                switch(con)
                 {
-                    fTPServer.Stop();
+                    case "q":
+                        fTPServer.Stop();
+                        goto label;
+                        break;
+                    case "adduser":
+                        // TODO : 增加用户功能
+                        break;
+                    default:
+                        Console.WriteLine("Unkwon common");
                     break;
                 }
             }
 
+            label: 
             GC.Collect();
         }
     }
