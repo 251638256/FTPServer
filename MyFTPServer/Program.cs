@@ -1,6 +1,10 @@
 ﻿using AdvancedFTPServer;
+using Microsoft.EntityFrameworkCore;
+using MyFTPServer.MyDBContext;
+using Microsoft.EntityFrameworkCore.Extensions;
 using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace MyFTPServer
 {
@@ -10,6 +14,16 @@ namespace MyFTPServer
 
         static void Main(string[] args)
         {
+
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            dbContextOptionsBuilder.UseSqlServer(@"Data Source=192.168.0.60\SQLEXPRESS;Initial Catalog=FTPDatabase;User ID=admin;password=123;Integrated Security=false", c => {
+                c.UseRowNumberForPaging(false);
+            });
+            FTPDBContext fTPDBContext = new FTPDBContext(dbContextOptionsBuilder.Options);
+            fTPDBContext.Database.EnsureCreated();
+            fTPDBContext.Seed();
+
+
             string curpath = AppDomain.CurrentDomain.BaseDirectory;
             string configFilePath = Path.Combine(curpath, "mysetting.config");
             if (File.Exists(configFilePath))
