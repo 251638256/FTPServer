@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MyFTPServer.Classes
 {
-    static class DirectoryHelper
+    public static class DirectoryHelper
     {
 
         public static string GetExactPath(string Path)
@@ -15,33 +15,16 @@ namespace MyFTPServer.Classes
 
             if (Path == null) Path = "";
 
-            string dir = Path.Replace("/", "\\");
+            //string dir = Path.Replace("/", "\\");
+            string dir = Path;
 
-            if (!dir.EndsWith("\\")) dir += "\\";
+            if (!dir.EndsWith(Constant.SplitChar)) dir += Constant.SplitChar;
 
-            if (!Path.StartsWith("/")) dir = "\\" + dir;
+            if (!Path.StartsWith(Constant.SplitChar)) dir = Constant.SplitChar + dir;
 
-            ArrayList pathParts = new ArrayList();
-            dir = dir.Replace("\\\\", "\\");
-            string[] p = dir.Split('\\');
-            pathParts.AddRange(p);
+            dir = dir.Replace(@"\\", @"\");
 
-            for (int i = 0; i < pathParts.Count; i++)
-            {
-                if (pathParts[i].ToString() == "..")
-                {
-                    if (i > 0)
-                    {
-                        pathParts.RemoveAt(i - 1);
-                        i--;
-                    }
-
-                    pathParts.RemoveAt(i);
-                    i--;
-                }
-            }
-
-            return dir.Replace("\\\\", "\\");
+            return dir;
         }
     }
 }
