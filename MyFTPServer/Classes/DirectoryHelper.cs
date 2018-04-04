@@ -36,6 +36,8 @@ namespace MyFTPServer.Classes
                 dir += @"\";
             }
 
+            Console.WriteLine("The Path is : " + dir);
+
             return dir;
         }
 

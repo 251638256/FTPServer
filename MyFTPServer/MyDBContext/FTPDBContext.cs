@@ -13,12 +13,23 @@ namespace MyFTPServer.MyDBContext
 
         static FtpDbContext()
         {
-            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
             string uoso = @"Data Source=.\MSSQLSERVER2008;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
             string home = @"Data Source=.;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
-            dbContextOptionsBuilder.UseSqlServer(uoso, c => {
-                c.UseRowNumberForPaging(false);
+
+            string tencentMySqlConnectionString = "Server=118.24.25.173;User Id=root;Password=123;Database=MyFtp";
+
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+
+            // SQL SERVER
+            //dbContextOptionsBuilder.UseSqlServer(uoso, c => {
+            //    c.UseRowNumberForPaging(false);
+            //});
+
+            // MYSQL
+            dbContextOptionsBuilder.UseMySql(tencentMySqlConnectionString, c => {
             });
+
+
             FtpDbContext fTPDBContext = new FtpDbContext(dbContextOptionsBuilder.Options);
             fTPDBContext.Database.EnsureCreated();
             fTPDBContext.Seed();

@@ -374,18 +374,6 @@ namespace AdvancedFTPServer
                 {
                     if (ConnectedUser.CanDeleteFiles)
                     {
-                        //if (ApplicationSettings.MoveDeletedFilesToRecycleBin)
-                        //{
-                        //    //Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(Path,
-                        //    //    Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
-                        //    //    Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
-
-                        //    string RecycleBinPath = Path.Substring(0, 2) + "\\RECYCLER\\";
-                        //    if (!Directory.Exists(RecycleBinPath))
-                        //        Directory.CreateDirectory(RecycleBinPath);
-                        //    File.Move(Path, RecycleBinPath + System.IO.Path.GetFileName(Path));
-                        //}
-                        //else
                         FileInfo FI = new FileInfo(Path);
                         FI.Attributes = FileAttributes.Normal; // This is required to delete a readonly file
                         File.Delete(Path);
