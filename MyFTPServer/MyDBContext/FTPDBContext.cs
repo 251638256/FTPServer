@@ -14,7 +14,9 @@ namespace MyFTPServer.MyDBContext
         static FtpDbContext()
         {
             DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlServer(@"Data Source=.;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false", c => {
+            string uoso = @"Data Source=.\MSSQLSERVER2008;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
+            string home = @"Data Source=.;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
+            dbContextOptionsBuilder.UseSqlServer(uoso, c => {
                 c.UseRowNumberForPaging(false);
             });
             FtpDbContext fTPDBContext = new FtpDbContext(dbContextOptionsBuilder.Options);
