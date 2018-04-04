@@ -2,6 +2,12 @@ using System;
 using System.Collections;
 using System.Net.Sockets;
 using System.Net;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Data.SqlClient;
+using MyFTPServer.MyDBContext;
 
 namespace AdvancedFTPServer
 {
@@ -11,15 +17,16 @@ namespace AdvancedFTPServer
 
         internal ArrayList FTPClients = new ArrayList();
 
-        public static string CommonPath;
-        
-        internal string Status
-        {
-            get { if (FTPListener == null)return "value=\"0\""; else return "value=\"1\" checked"; }
+        public static Queue<string> Tasks = new Queue<string>();
+
+        [Obsolete("Don't use it")]
+        public static string CommonPath = "";
+
+        internal string Status {
+            get { if (FTPListener == null) return "value=\"0\""; else return "value=\"1\" checked"; }
         }
 
-        internal bool IsRunning
-        {
+        internal bool IsRunning {
             get { return FTPListener != null; }
         }
 
@@ -41,6 +48,7 @@ namespace AdvancedFTPServer
                 //ApplicationLog.Write(LogSource.FTP, Ex);
                 Console.WriteLine("创建Sockert失败" + Ex.GetBaseException()?.Message);
             }
+
             return false;
         }
 
@@ -49,11 +57,48 @@ namespace AdvancedFTPServer
             if (FTPListener != null) FTPListener.Stop(); FTPListener = null;
         }
 
+        public static object AsyncObj = new object();
+
+        /// <summary>
+        /// 文件上传完毕的回调 处理上传完毕的文件
+        /// </summary>
+        public void UpLoadFinished()
+        {
+            lock (AsyncObj)
+            {
+                while (Tasks.Count > 0)
+                {
+                    string path = Tasks.Dequeue();
+                    FileStream loadFile = new FileStream(path, FileMode.Open, FileAccess.Read);
+                    IFormatter serializer = new BinaryFormatter();
+                    List<Test> tests2 = serializer.Deserialize(loadFile) as List<Test>;
+
+                    // TODO : 存到数据库
+                    for (int i = 0; i < tests2.Count; i++)
+                    {
+                        FtpDbContext.Instance.User.Add(new User()
+                        {
+                            LoginName = "AA"
+                        });
+                    }
+                    FtpDbContext.Instance.SaveChanges();
+                }
+            }
+
+        }
+
+        public class Test
+        {
+
+        }
+
         void NewFTPClientArrived(IAsyncResult arg)
         {
             try
             {
-                FTPClients.Add(new FTPClient(FTPListener.EndAcceptSocket(arg)));
+                FTPClient client = new FTPClient(FTPListener.EndAcceptSocket(arg));
+                client.Uploaded = UpLoadFinished;
+                FTPClients.Add(client);
             }
             catch (Exception Ex)
             {

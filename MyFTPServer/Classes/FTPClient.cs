@@ -13,6 +13,8 @@ namespace AdvancedFTPServer
     class FTPClient
     {
         #region Construction
+        public Action Uploaded;
+
         internal DateTime ConnectedTime;
         internal DateTime LastInteraction;
 
@@ -299,6 +301,8 @@ namespace AdvancedFTPServer
             SendMessage(ReturnMessage);
         }
 
+        public static object AsyncObj = new object();
+
         void STOR(string CmdArguments)
         {
             if (!ConnectedUser.CanStoreFiles)
@@ -342,10 +346,17 @@ namespace AdvancedFTPServer
                 tmpBuffer = null;
 
                 SendMessage("226 Transfer Complete.\r\n");
-                
+
                 // TODO 
                 // Parse this File And Save to Datebase
-
+                if (Path.Contains(".CardData"))
+                {
+                    lock (AsyncObj)
+                    { 
+                        FTPServer.Tasks.Enqueue(Path);
+                    }
+                    Uploaded.Invoke();
+                }
             }
             catch
             {
