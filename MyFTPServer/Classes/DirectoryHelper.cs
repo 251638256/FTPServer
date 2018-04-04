@@ -36,17 +36,34 @@ namespace MyFTPServer.Classes
 
         public static string CDUP(string workingPath)
         {
-            string[] pathParts = workingPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string path = "/";
+            if (workingPath.Contains(@"\") && workingPath.Contains(@"/"))
+            {
+                workingPath = workingPath.Replace(@"/", @"\");
+            }
+
+            string[] pathParts = workingPath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length > 1)
             {
+                string path = "/";
                 for (int i = 0; i < pathParts.Length - 1; i++)
                 {
                     path += pathParts[i] + "/";
                 }
+                return path;
             }
 
-            return path;
+            string[] pathParts2 = workingPath.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pathParts2.Length > 1)
+            {
+                string path = "\\";
+                for (int i = 0; i < pathParts2.Length - 1; i++)
+                {
+                    path += pathParts2[i] + "\\";
+                }
+                return path;
+            }
+
+            return workingPath;
         }
     }
 }
