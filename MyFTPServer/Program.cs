@@ -18,36 +18,33 @@ namespace MyFTPServer
             //Console.ReadKey();
             var instance = FtpDbContext.Instance;
 
-            string curpath = AppDomain.CurrentDomain.BaseDirectory;
-            string configFilePath = Path.Combine(curpath, "mysetting.config");
-            if (File.Exists(configFilePath))
-            {
-                string[] config = File.ReadAllLines(configFilePath);
-                foreach (var item in config)
-                {
-                    string key = item.Split(' ')[0];
-                    string value = item.Split(' ')[1];
-                    if (key == "workDirectory" && !string.IsNullOrEmpty(value))
-                    {
-                        FTPServer.CommonPath = value;
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Input File Path");
-                string path = Console.ReadLine();
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                FTPServer.CommonPath = path;
-                File.WriteAllText(configFilePath, "workDirectory " + path);
-            }
-
-
-            Console.WriteLine("successed");
-            Console.WriteLine("server start , listing port : 21");
+            //string curpath = AppDomain.CurrentDomain.BaseDirectory;
+            //string configFilePath = Path.Combine(curpath, "mysetting.config");
+            //if (File.Exists(configFilePath))
+            //{
+            //    string[] config = File.ReadAllLines(configFilePath);
+            //    foreach (var item in config)
+            //    {
+            //        string key = item.Split(' ')[0];
+            //        string value = item.Split(' ')[1];
+            //        if (key == "workDirectory" && !string.IsNullOrEmpty(value))
+            //        {
+            //            FTPServer.CommonPath = value;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Input File Path");
+            //    string path = Console.ReadLine();
+            //    if (!Directory.Exists(path))
+            //    {
+            //        Directory.CreateDirectory(path);
+            //    }
+            //    FTPServer.CommonPath = path;
+            //    File.WriteAllText(configFilePath, "workDirectory " + path);
+            //}
+            Console.WriteLine("server started , listening port : 21");
 
             fTPServer = new FTPServer();
             fTPServer.Start();
@@ -63,7 +60,17 @@ namespace MyFTPServer
                         goto label;
                         break;
                     case "adduser":
-                        // TODO : 增加用户功能
+                        User user = new User();
+                        Console.WriteLine("Input LoginName!");
+                        user.LoginName = Console.ReadLine();
+                        Console.WriteLine("Input Password!");
+                        user.Password = Console.ReadLine();
+                        Console.WriteLine("Input Work Directory!");
+                        user.WorkdDirectory = Console.ReadLine();
+                        user.CanCopyFiles = user.CanDeleteFiles = user.CanDeleteFolders = user.CanRenameFiles = user.CanRenameFolders = user.CanStoreFiles = user.CanStoreFolder = user.CanViewHiddenFiles = user.CanViewHiddenFolders = true;
+                        FtpDbContext.Instance.Entry<User>(user).State = EntityState.Added;
+                        FtpDbContext.Instance.SaveChanges();
+                        Console.WriteLine("add successed");
                         break;
                     case "cls":
                         Console.Clear();
