@@ -342,6 +342,10 @@ namespace AdvancedFTPServer
                 tmpBuffer = null;
 
                 SendMessage("226 Transfer Complete.\r\n");
+                
+                // TODO 
+                // Parse this File And Save to Datebase
+
             }
             catch
             {
