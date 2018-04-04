@@ -7,6 +7,7 @@ using System.Text;
 
 namespace MyFTPServer.MyDBContext
 {
+    [Serializable]
     public class PhysicalCard
     {
         public int Id { get; set; }
@@ -15,7 +16,7 @@ namespace MyFTPServer.MyDBContext
         public string Name { get; set; }
 
         [Required]
-        public string Age { get; set; }
+        public int Age { get; set; }
 
         [Required]
         public string Sex { get; set; }
