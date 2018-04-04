@@ -9,7 +9,7 @@ namespace MyFTPServer.Classes
     public static class DirectoryHelper
     {
 
-        public static string GetExactPath(string Path, FTPUser ConnectedUser = null)
+        public static string GetExactPath(string Path, FTPUser ConnectedUser)
         {
             // Windows : C:\Users\work\Source\Repos\MyFTPServer\MyFTPServer\Classes
             // Linux : /root/myftppath

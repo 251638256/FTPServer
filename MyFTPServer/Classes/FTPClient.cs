@@ -235,7 +235,7 @@ namespace AdvancedFTPServer
             Socket DataSocket = null;
             try
             {
-                string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+                string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
                 Path = Path.Substring(0, Path.Length - 1);
 
                 if (!ConnectedUser.CanViewHiddenFiles && (File.GetAttributes(Path) & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -388,7 +388,9 @@ namespace AdvancedFTPServer
         {
             if (!ConnectedUser.CanRenameFiles) { SendMessage("550 Access Denied.\r\n"); return; }
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+            if (Path.EndsWith("/") || Path.EndsWith(@"\"))
+                Path = Path.Substring(0, Path.Length - 1);
 
             if (Directory.Exists(Path) || File.Exists(Path))
             {
@@ -406,7 +408,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Directory.Exists(Path) || File.Exists(Path))
                 SendMessage("550 File or folder with the same name already exists.\r\n");
@@ -439,7 +441,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Directory.Exists(Path))
             {
@@ -461,7 +463,7 @@ namespace AdvancedFTPServer
                 return;
             }
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Directory.Exists(Path) || File.Exists(Path))
                 SendMessage("550 A file or folder with the same name already exists.\r\n");
@@ -559,7 +561,7 @@ namespace AdvancedFTPServer
 
         void NLST(string CmdArguments)
         {
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
             if (!Directory.Exists(Path))
             {
                 SendMessage("550 Invalid Path.\r\n");
