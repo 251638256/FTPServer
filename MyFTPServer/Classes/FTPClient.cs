@@ -171,11 +171,17 @@ namespace AdvancedFTPServer
                             break;
                         case "TYPE": TYPE(CmdArguments); break;
                         case "RETR": RETR(CmdArguments); break;
-                        case "STOR": STOR(CmdArguments); break;
+                        case "STOR":
+                            // 上传文件
+                            STOR(CmdArguments);
+                            break;
                         case "APPE": APPE(CmdArguments); break;
                         case "RNFR": RNFR(CmdArguments); break;
                         case "RNTO": RNTO(CmdArguments); break;
-                        case "DELE": DELE(CmdArguments); break;
+                        case "DELE":
+                            // 删除文件
+                            DELE(CmdArguments);
+                            break;
                         case "RMD": RMD(CmdArguments); break;
                         case "MKD": MKD(CmdArguments); break;
 
@@ -335,8 +341,13 @@ namespace AdvancedFTPServer
 
         void DELE(string CmdArguments)
         {
-            string Path = DirectoryHelper.GetExactPath(CmdArguments);
-            Path = ConnectedUser.StartUpDirectory + Path.Substring(0, Path.Length - 1);
+            string Path = DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+
+            if (Path.EndsWith("/") || Path.EndsWith(@"\"))
+                Path = ConnectedUser.StartUpDirectory + Path.Substring(0, Path.Length - 1);
+            else
+                Path = ConnectedUser.StartUpDirectory + Path;
+
             try
             {
                 if (File.Exists(Path))
