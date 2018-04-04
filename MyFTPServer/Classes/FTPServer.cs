@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Data.SqlClient;
 using MyFTPServer.MyDBContext;
+using System.Linq;
 
 namespace AdvancedFTPServer
 {
@@ -73,15 +74,22 @@ namespace AdvancedFTPServer
                     IFormatter serializer = new BinaryFormatter();
                     List<Test> tests2 = serializer.Deserialize(loadFile) as List<Test>;
 
-                    // TODO : 存到数据库
-                    for (int i = 0; i < tests2.Count; i++)
+                    if (tests2 != null && tests2.Any())
                     {
-                        FtpDbContext.Instance.User.Add(new User()
+                        // TODO : 存到数据库
+                        for (int i = 0; i < tests2.Count; i++)
                         {
-                            LoginName = "AA"
-                        });
+                            //FtpDbContext.Instance.User.Add(new User()
+                            //{
+                            //    LoginName = "AA"
+                            //});
+                        }
+                        FtpDbContext.Instance.SaveChanges();
                     }
-                    FtpDbContext.Instance.SaveChanges();
+                    else
+                    {
+                        // LOG 
+                    }
                 }
             }
 
