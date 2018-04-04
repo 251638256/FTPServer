@@ -34,5 +34,15 @@ namespace MyFTPServerTest
         {
             // Ã»·¨²â
         }
+
+        [Fact]
+        public void CDUPTest()
+        {
+            string a = DirectoryHelper.CDUP(@"/aa/bb/cc/dd");
+            string b = DirectoryHelper.CDUP(@"\aa\bb\cc\dd");
+            string c = DirectoryHelper.CDUP(@"/aa/bb/cc/");
+            string d = DirectoryHelper.CDUP(@"\aa\bb\cc\dd\");
+
+        }
     }
 }

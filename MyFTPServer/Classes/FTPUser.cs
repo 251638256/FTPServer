@@ -21,7 +21,7 @@ namespace AdvancedFTPServer
 
         internal string UserName = "";
         internal string StartUpDirectory = @"";
-        internal string CurrentWorkingDirectory = "\\";
+        internal string CurrentWorkingDirectory = "/";
         internal bool IsAuthenticated = false;
         string Password = "";
 

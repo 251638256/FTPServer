@@ -65,6 +65,9 @@ namespace MyFTPServer
                     case "adduser":
                         // TODO : 增加用户功能
                         break;
+                    case "cls":
+                        Console.Clear();
+                        break;
                     default:
                         Console.WriteLine("Unkwon common");
                     break;

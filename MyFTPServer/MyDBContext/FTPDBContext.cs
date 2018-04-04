@@ -70,7 +70,7 @@ namespace MyFTPServer.MyDBContext
                     CanStoreFolder = true,
                     CanViewHiddenFiles = true,
                     CanViewHiddenFolders = true,
-                    WorkdDirectory = Constant.IsUnixOrMacOSX ? "/" : @"c:\"
+                    WorkdDirectory = Constant.IsUnixOrMacOSX ? "/" : @"D:\FTP"
                 }).State = EntityState.Added;
             }
         }
@@ -89,10 +89,10 @@ namespace MyFTPServer.MyDBContext
                 this.Entry<Dictionary>(new Dictionary() { Key = "MinPOVE", Value = "7000" }).State = EntityState.Added;
             }
 
-            Dictionary MaxPove = Dictionary.FirstOrDefault(c => c.Key == "MaxPove");
+            Dictionary MaxPove = Dictionary.FirstOrDefault(c => c.Key == "MaxPOVE");
             if (MaxPove == null)
             {
-                this.Entry<Dictionary>(new Dictionary() { Key = "MaxPove", Value = "8000" }).State = EntityState.Added;
+                this.Entry<Dictionary>(new Dictionary() { Key = "MaxPOVE", Value = "8000" }).State = EntityState.Added;
             }
         }
     }

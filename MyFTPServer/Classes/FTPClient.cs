@@ -18,28 +18,22 @@ namespace AdvancedFTPServer
 
         // Used inside PORT method
         IPEndPoint ClientEndPoint = null;
-        internal string SessionID
-        {
-            get
-            {
+        internal string SessionID {
+            get {
                 return ConnectedTime.Ticks.ToString();
             }
         }
         Socket ClientSocket;
         internal FTPUser ConnectedUser;
 
-        internal string EndPoint
-        {
-            get
-            {
+        internal string EndPoint {
+            get {
                 return ClientSocket.RemoteEndPoint.ToString();
             }
         }
 
-        internal bool IsConnected
-        {
-            get
-            {
+        internal bool IsConnected {
+            get {
                 if (ClientSocket == null || !ClientSocket.Connected || ConnectedTime.ToString("HH:mm:ss") == LastInteraction.ToString("HH:mm:ss")) { Disconnect(); return false; }
                 return true;
             }
@@ -135,13 +129,16 @@ namespace AdvancedFTPServer
             if (!CommandExecued)
             {
                 // ConnectedUser.IsAuthenticated
-                if (ConnectedUser.IsAuthenticated) { 
+                if (ConnectedUser.IsAuthenticated)
+                {
                     Console.WriteLine("命令内容 " + Command + "  参数内容 " + CmdArguments);
                     switch (Command)
                     {
                         case "CWD":
                             // 确定目录是否存在
-                            string dir = DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+                            string dir = DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
+                            //string dir = CmdArguments;
+
                             if (ConnectedUser.ChangeDirectory(dir))
                                 SendMessage("250 CWD command successful.\r\n");
                             else SendMessage("550 System can't find directory '" + dir + "'.\r\n");
@@ -156,7 +153,12 @@ namespace AdvancedFTPServer
                             LIST(CmdArguments);
                             break;
 
-                        case "CDUP": CDUP(CmdArguments); break;
+                        case "CDUP":
+                            // 获取上级目录地址设置到currentWorkdDirectory
+                            string curpath = DirectoryHelper.CDUP(ConnectedUser.CurrentWorkingDirectory);
+                            ConnectedUser.CurrentWorkingDirectory = curpath;
+                            SendMessage("250 CDUP command successful.\r\n");
+                            break;
                         case "QUIT": SendMessage("221 FTP server signing off\r\n"); Disconnect(); break;
                         case "PORT": PORT(CmdArguments); break;
                         case "PASV": PASV(CmdArguments); break;
@@ -176,23 +178,23 @@ namespace AdvancedFTPServer
                         case "NOOP": SendMessage("200 OK\r\n"); break;
                         default: SendMessage($"500 Unknown Command.\r\n"); break;
 
-                        //	case "STAT":
-                        //		break;
+                            //	case "STAT":
+                            //		break;
 
-                        //	case "HELP":
-                        //		break;
+                            //	case "HELP":
+                            //		break;
 
-                        //	case "REIN":
-                        //		break;
+                            //	case "REIN":
+                            //		break;
 
-                        //	case "STOU":
-                        //		break;
+                            //	case "STOU":
+                            //		break;
 
-                        //	case "REST":
-                        //		break;
+                            //	case "REST":
+                            //		break;
 
-                        //	case "ABOR":
-                        //		break;
+                            //	case "ABOR":
+                            //		break;
                     }
                 }
                 else SendMessage("530 Access Denied! Authenticate first\r\n");
@@ -204,20 +206,7 @@ namespace AdvancedFTPServer
 
         #region Command Methods
 
-        void CDUP(string CmdArguments)
-        {
-            string[] pathParts = ConnectedUser.CurrentWorkingDirectory.Split('\\');
-            if (pathParts.Length > 1)
-            {
-                ConnectedUser.CurrentWorkingDirectory = "";
-                for (int i = 0; i < (pathParts.Length - 2); i++)
-                {
-                    ConnectedUser.CurrentWorkingDirectory += pathParts[i] + "\\";
-                }
-            }
 
-            SendMessage("250 CDUP command successful.\r\n");
-        }
 
         void RETR(string CmdArguments)
         {
@@ -250,7 +239,7 @@ namespace AdvancedFTPServer
                 goto FinaliseAll;
             }
 
-            
+
             DataSocket = GetDataSocket();
             if (DataSocket == null)
                 goto FinaliseAll;
@@ -266,7 +255,7 @@ namespace AdvancedFTPServer
                 ReturnMessage = "426 Transfer aborted.\r\n";
             }
 
-        FinaliseAll:
+            FinaliseAll:
             if (FS != null) FS.Close(); FS = null;
             if (DataSocket != null && DataSocket.Connected)
             {
@@ -533,7 +522,7 @@ namespace AdvancedFTPServer
             {
                 SendMessage("550 Invalid path specified.\r\n");
             }
-            catch(UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 SendMessage("426 权限不足.\r\n");
             }
@@ -613,7 +602,7 @@ namespace AdvancedFTPServer
         {
             // Open listener within the specified port range
             int tmpPort = 7000;
-        StartListener:
+            StartListener:
             if (DataListener != null) { DataListener.Stop(); DataListener = null; }
             try
             {

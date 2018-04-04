@@ -16,23 +16,37 @@ namespace MyFTPServer.Classes
 
             if (Path == null) Path = "";
 
-            //string dir = Path.Replace("/", "\\");
             string dir = Path;
 
+            string CurrentWorkingDirectory = ConnectedUser?.CurrentWorkingDirectory ?? "/";
+            if ((dir.StartsWith("/") == false && dir.StartsWith(@"\") == false))
+                dir = CurrentWorkingDirectory + "/" + dir;
+            else
+                dir = Path;
 
-            if (!Path.StartsWith(Constant.SplitChar) && ConnectedUser?.CurrentWorkingDirectory != null)
-                dir = ConnectedUser.CurrentWorkingDirectory + dir;
+            //if (!dir.EndsWith(Constant.SplitChar)) dir += Constant.SplitChar;
 
-
-            if (!dir.EndsWith(Constant.SplitChar)) dir += Constant.SplitChar;
-
-            if (!Path.StartsWith(Constant.SplitChar)) dir = Constant.SplitChar + dir;
+            //if (!Path.StartsWith(Constant.SplitChar)) dir = Constant.SplitChar + dir;
 
             dir = dir.Replace(@"\\", @"\");
             dir = dir.Replace(@"//", @"/");
 
-
             return dir;
+        }
+
+        public static string CDUP(string workingPath)
+        {
+            string[] pathParts = workingPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string path = "/";
+            if (pathParts.Length > 1)
+            {
+                for (int i = 0; i < pathParts.Length - 1; i++)
+                {
+                    path += pathParts[i] + "/";
+                }
+            }
+
+            return path;
         }
     }
 }
