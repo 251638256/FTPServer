@@ -46,6 +46,8 @@ namespace MyFTPServer.MyDBContext
 
         public DbSet<Dictionary> Dictionary { get; set; }
 
+        public DbSet<PhysicalCard> PhysicalCard { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -59,12 +61,12 @@ namespace MyFTPServer.MyDBContext
 
         public void Seed()
         {
-            AddTestUser();
+            AddTestUsers();
             AddSimplyConfigrution();
             this.SaveChanges();
         }
 
-        private void AddTestUser()
+        private void AddTestUsers()
         {
             User user = User.FirstOrDefault(c => c.LoginName == "test");
             if (user == null)
@@ -81,7 +83,27 @@ namespace MyFTPServer.MyDBContext
                     CanStoreFolder = true,
                     CanViewHiddenFiles = true,
                     CanViewHiddenFolders = true,
-                    WorkdDirectory = Constant.IsUnixOrMacOSX ? "/" : @"D:\FTP"
+                    WorkdDirectory = @"/root/myftppath/"
+                }).State = EntityState.Added;
+            }
+
+            User wzy = User.FirstOrDefault(c => c.LoginName == "wzy");
+            if (wzy == null)
+            {
+                this.Entry<User>(new User()
+                {
+                    LoginName = "wzy",
+                    Password = "123",
+                    CanCopyFiles = true,
+                    CanDeleteFiles = true,
+                    CanDeleteFolders = true,
+                    CanRenameFiles = true,
+                    CanRenameFolders = true,
+                    CanStoreFiles = true,
+                    CanStoreFolder = true,
+                    CanViewHiddenFiles = true,
+                    CanViewHiddenFolders = true,
+                    WorkdDirectory = @"D:\ftp_test"
                 }).State = EntityState.Added;
             }
         }
