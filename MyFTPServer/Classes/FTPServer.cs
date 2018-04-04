@@ -23,11 +23,13 @@ namespace AdvancedFTPServer
         [Obsolete("Don't use it")]
         public static string CommonPath = "";
 
-        internal string Status {
+        internal string Status
+        {
             get { if (FTPListener == null) return "value=\"0\""; else return "value=\"1\" checked"; }
         }
 
-        internal bool IsRunning {
+        internal bool IsRunning
+        {
             get { return FTPListener != null; }
         }
 
@@ -70,26 +72,23 @@ namespace AdvancedFTPServer
                 while (Tasks.Count > 0)
                 {
                     string path = Tasks.Dequeue();
-                    FileStream loadFile = new FileStream(path, FileMode.Open, FileAccess.Read);
-                    IFormatter serializer = new BinaryFormatter();
-                    List<Test> tests2 = serializer.Deserialize(loadFile) as List<Test>;
+                    using (FileStream loadFile = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    {
+                        IFormatter serializer = new BinaryFormatter();
+                        List<PhysicalCard> tests2 = serializer.Deserialize(loadFile) as List<PhysicalCard>;
 
-                    if (tests2 != null && tests2.Any())
-                    {
-                        // TODO : ´æµ½Êý¾Ý¿â
-                        for (int i = 0; i < tests2.Count; i++)
+                        var dbcontext = FtpDbContext.Instance;
+                        if (tests2 != null && tests2.Any())
                         {
-                            //FtpDbContext.Instance.User.Add(new User()
-                            //{
-                            //    LoginName = "AA"
-                            //});
+                            dbcontext.PhysicalCard.AddRange(tests2);
+                            dbcontext.SaveChanges();
                         }
-                        FtpDbContext.Instance.SaveChanges();
+                        else
+                        {
+                            // LOG 
+                        }
                     }
-                    else
-                    {
-                        // LOG 
-                    }
+
                 }
             }
 

@@ -11,7 +11,7 @@ namespace MyFTPServerTest
 {
     public class FTPClientTest
     {
-        //[Fact]
+        [Fact]
         public void Serialize()
         {
             //using(SqlConnection con = new SqlConnection())
@@ -26,28 +26,36 @@ namespace MyFTPServerTest
             //    }
             //}
 
+
             FileStream file = new FileStream(@"C:\Projects\pic.jpg", FileMode.Open);
             byte[] bytes = new byte[file.Length];
             file.Read(bytes, 0, bytes.Length);
             string base64 = Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             file.Close();
 
-            List<PhysicalCard> physicalCards = new List<PhysicalCard>();
-            for (int i = 0; i < 300000 * 3; i++)
+            List<string> names = new List<string>() { "AAA", "BBB", "CCC" };
+            for (int c = 0; c < names.Count; c++)
             {
-                PhysicalCard physicalCard = new PhysicalCard();
-                physicalCard.Name = "WZY" + i.ToString().PadLeft(8);
-                physicalCard.Age = i % 60;
-                physicalCard.Sex = i % 2 == 0 ? "男" : "女";
-                physicalCard.Card = "123456789" + (i).ToString().PadLeft(9);
-                physicalCard.Pic = base64;
-                physicalCards.Add(physicalCard);
+                string name = names[c];
+
+                List<PhysicalCard> physicalCards = new List<PhysicalCard>();
+                for (int i = 0; i < 1500; i++)
+                {
+                    PhysicalCard physicalCard = new PhysicalCard();
+                    physicalCard.Name = name + i.ToString().PadLeft(8, '0');
+                    physicalCard.Age = i % 60;
+                    physicalCard.Sex = i % 2 == 0 ? "男" : "女";
+                    physicalCard.Card = "123456789" + (i).ToString().PadLeft(9, '0');
+                    physicalCard.Pic = base64;
+                    physicalCards.Add(physicalCard);
+                }
+
+                FileStream file2 = new FileStream(@"D:\ftp_test\NotUpload\" + name + ".helloworld", FileMode.Create);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(file2, physicalCards);
+                file2.Close();
             }
 
-            FileStream file2 = new FileStream(@"D:\ftp_test\testData.helloworld", FileMode.Create);
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            binaryFormatter.Serialize(file2, physicalCards);
-            file2.Close();
         }
 
         //[Fact]

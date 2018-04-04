@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 using MyFTPServer.Classes;
+using System.Threading.Tasks;
 
 namespace AdvancedFTPServer
 {
@@ -20,22 +21,28 @@ namespace AdvancedFTPServer
 
         // Used inside PORT method
         IPEndPoint ClientEndPoint = null;
-        internal string SessionID {
-            get {
+        internal string SessionID
+        {
+            get
+            {
                 return ConnectedTime.Ticks.ToString();
             }
         }
         Socket ClientSocket;
         internal FTPUser ConnectedUser;
 
-        internal string EndPoint {
-            get {
+        internal string EndPoint
+        {
+            get
+            {
                 return ClientSocket.RemoteEndPoint.ToString();
             }
         }
 
-        internal bool IsConnected {
-            get {
+        internal bool IsConnected
+        {
+            get
+            {
                 if (ClientSocket == null || !ClientSocket.Connected || ConnectedTime.ToString("HH:mm:ss") == LastInteraction.ToString("HH:mm:ss")) { Disconnect(); return false; }
                 return true;
             }
@@ -182,13 +189,15 @@ namespace AdvancedFTPServer
                             // 上传文件
                             STOR(CmdArguments);
                             break;
-                        case "APPE": APPE(CmdArguments);
+                        case "APPE":
+                            APPE(CmdArguments);
                             break;
                         case "RNFR":
                             // 重命名
                             RNFR(CmdArguments);
                             break;
-                        case "RNTO": RNTO(CmdArguments);
+                        case "RNTO":
+                            RNTO(CmdArguments);
                             break;
                         case "DELE":
                             // 删除文件
@@ -204,13 +213,17 @@ namespace AdvancedFTPServer
                             break;
 
 
-                        case "NLST": NLST(CmdArguments);
+                        case "NLST":
+                            NLST(CmdArguments);
                             break;
-                        case "SYST": SendMessage("215 Windows_NT\r\n");
+                        case "SYST":
+                            SendMessage("215 Windows_NT\r\n");
                             break;
-                        case "NOOP": SendMessage("200 OK\r\n");
+                        case "NOOP":
+                            SendMessage("200 OK\r\n");
                             break;
-                        default: SendMessage($"500 Unknown Command.\r\n");
+                        default:
+                            SendMessage($"500 Unknown Command.\r\n");
                             break;
 
                             //	case "STAT":
@@ -257,7 +270,7 @@ namespace AdvancedFTPServer
             Socket DataSocket = null;
             try
             {
-                string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+                string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
                 Path = Path.Substring(0, Path.Length - 1);
 
                 if (!ConnectedUser.CanViewHiddenFiles && (File.GetAttributes(Path) & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -312,7 +325,7 @@ namespace AdvancedFTPServer
             }
             Stream FS = null;
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Path.EndsWith("/") || Path.EndsWith(@"\"))
                 Path = Path.Substring(0, Path.Length - 1);
@@ -349,16 +362,20 @@ namespace AdvancedFTPServer
 
                 // TODO 
                 // Parse this File And Save to Datebase
-                if (Path.Contains(".CardData"))
+                if (Path.EndsWith(".helloworld"))
                 {
+                    FS.Close();
                     lock (AsyncObj)
-                    { 
+                    {
                         FTPServer.Tasks.Enqueue(Path);
                     }
-                    Uploaded.Invoke();
+                    Task.Factory.StartNew(() => {
+                        Uploaded.Invoke();
+                    });
+
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 SendMessage("426 Connection closed unexpectedly.\r\n");
             }
@@ -376,7 +393,7 @@ namespace AdvancedFTPServer
 
         void DELE(string CmdArguments)
         {
-            string Path = DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+            string Path = DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Path.EndsWith("/") || Path.EndsWith(@"\"))
                 Path = ConnectedUser.StartUpDirectory + Path.Substring(0, Path.Length - 1);
@@ -411,7 +428,7 @@ namespace AdvancedFTPServer
         {
             if (!ConnectedUser.CanRenameFiles) { SendMessage("550 Access Denied.\r\n"); return; }
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
             if (Path.EndsWith("/") || Path.EndsWith(@"\"))
                 Path = Path.Substring(0, Path.Length - 1);
 
@@ -485,8 +502,8 @@ namespace AdvancedFTPServer
                 SendMessage("550 Access Denied.\r\n");
                 return;
             }
-            
-            
+
+
             string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Directory.Exists(Path) || File.Exists(Path))

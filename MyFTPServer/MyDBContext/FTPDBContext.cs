@@ -9,7 +9,34 @@ namespace MyFTPServer.MyDBContext
 {
     class FtpDbContext : DbContext
     {
-        public static FtpDbContext Instance;
+        public static FtpDbContext Instance
+        {
+            get
+            {
+                string uoso = @"Data Source=.\MSSQLSERVER2008;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
+                string home = @"Data Source=.;Initial Catalog=FTPDatabase;User ID=sa;password=123;Integrated Security=false";
+
+                string tencentMySqlConnectionString = "Server=118.24.25.173;User Id=root;Password=123;Database=MyFtp";
+
+                DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+
+                // SQL SERVER
+                dbContextOptionsBuilder.UseSqlServer(home, c =>
+                {
+                    c.UseRowNumberForPaging(false);
+                });
+
+                // MYSQL
+                //dbContextOptionsBuilder.UseMySql(tencentMySqlConnectionString, c => {
+                //});
+
+
+                FtpDbContext fTPDBContext = new FtpDbContext(dbContextOptionsBuilder.Options);
+                fTPDBContext.Database.EnsureCreated();
+                fTPDBContext.Seed();
+                return fTPDBContext;
+            }
+        }
 
         static FtpDbContext()
         {
@@ -21,20 +48,21 @@ namespace MyFTPServer.MyDBContext
             DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
 
             // SQL SERVER
-            //dbContextOptionsBuilder.UseSqlServer(uoso, c => {
-            //    c.UseRowNumberForPaging(false);
-            //});
+            dbContextOptionsBuilder.UseSqlServer(home, c =>
+            {
+                c.UseRowNumberForPaging(false);
+            });
 
             // MYSQL
-            dbContextOptionsBuilder.UseMySql(tencentMySqlConnectionString, c => {
-            });
+            //dbContextOptionsBuilder.UseMySql(tencentMySqlConnectionString, c => {
+            //});
 
 
             FtpDbContext fTPDBContext = new FtpDbContext(dbContextOptionsBuilder.Options);
             fTPDBContext.Database.EnsureCreated();
             fTPDBContext.Seed();
 
-            Instance = fTPDBContext;
+            //Instance = fTPDBContext;
         }
 
         public FtpDbContext(DbContextOptions options) : base(options)
