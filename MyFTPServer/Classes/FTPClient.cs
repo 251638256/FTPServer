@@ -14,7 +14,7 @@ namespace AdvancedFTPServer
     class FTPClient
     {
         #region Construction
-        public Action Uploaded;
+        public event Action<string> Uploaded;
 
         internal DateTime ConnectedTime;
         internal DateTime LastInteraction;
@@ -365,12 +365,8 @@ namespace AdvancedFTPServer
                 if (Path.EndsWith(".helloworld"))
                 {
                     FS.Close();
-                    lock (AsyncObj)
-                    {
-                        FTPServer.Tasks.Enqueue(Path);
-                    }
                     Task.Factory.StartNew(() => {
-                        Uploaded.Invoke();
+                        Uploaded.Invoke(Path);
                     });
 
                 }

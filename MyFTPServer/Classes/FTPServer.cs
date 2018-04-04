@@ -16,12 +16,7 @@ namespace AdvancedFTPServer
     {
         TcpListener FTPListener;
 
-        internal ArrayList FTPClients = new ArrayList();
-
-        public static Queue<string> Tasks = new Queue<string>();
-
-        [Obsolete("Don't use it")]
-        public static string CommonPath = "";
+        internal List<FTPClient> FTPClients = new List<FTPClient>();
 
         internal string Status
         {
@@ -65,33 +60,27 @@ namespace AdvancedFTPServer
         /// <summary>
         /// 文件上传完毕的回调 处理上传完毕的文件
         /// </summary>
-        public void UpLoadFinished()
+        public void UpLoadFinished(string path)
         {
             lock (AsyncObj)
             {
-                while (Tasks.Count > 0)
+                using (FileStream loadFile = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
-                    string path = Tasks.Dequeue();
-                    using (FileStream loadFile = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    IFormatter serializer = new BinaryFormatter();
+                    List<PhysicalCard> tests2 = serializer.Deserialize(loadFile) as List<PhysicalCard>;
+
+                    var dbcontext = FtpDbContext.Instance;
+                    if (tests2 != null && tests2.Any())
                     {
-                        IFormatter serializer = new BinaryFormatter();
-                        List<PhysicalCard> tests2 = serializer.Deserialize(loadFile) as List<PhysicalCard>;
-
-                        var dbcontext = FtpDbContext.Instance;
-                        if (tests2 != null && tests2.Any())
-                        {
-                            dbcontext.PhysicalCard.AddRange(tests2);
-                            dbcontext.SaveChanges();
-                        }
-                        else
-                        {
-                            // LOG 
-                        }
+                        dbcontext.PhysicalCard.AddRange(tests2);
+                        dbcontext.SaveChanges();
                     }
-
+                    else
+                    {
+                        // TODO : 记录错误日志 
+                    }
                 }
             }
-
         }
 
         public class Test
@@ -104,7 +93,7 @@ namespace AdvancedFTPServer
             try
             {
                 FTPClient client = new FTPClient(FTPListener.EndAcceptSocket(arg));
-                client.Uploaded = UpLoadFinished;
+                client.Uploaded += UpLoadFinished;
                 FTPClients.Add(client);
             }
             catch (Exception Ex)
