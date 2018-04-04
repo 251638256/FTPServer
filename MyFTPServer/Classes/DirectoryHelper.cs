@@ -58,7 +58,7 @@ namespace MyFTPServer.Classes
                 }
                 return path;
             }
-            else if (pathParts.Length == 1)
+            else if (pathParts.Length == 1 && !pathParts[0].Contains("\\"))
             {
                 return "/";
             }
@@ -73,7 +73,7 @@ namespace MyFTPServer.Classes
                 }
                 return path;
             }
-            else if (pathParts2.Length == 1)
+            else if (pathParts2.Length == 1 && !pathParts[0].Contains("/"))
             {
                 return "\\";
             }
