@@ -69,7 +69,7 @@ namespace MyFTPServer
                         Console.Clear();
                         break;
                     default:
-                        Console.WriteLine("Unkwon common");
+                        //Console.WriteLine("Unkwon common");
                     break;
                 }
             }

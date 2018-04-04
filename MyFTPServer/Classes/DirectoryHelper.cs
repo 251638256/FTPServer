@@ -24,12 +24,17 @@ namespace MyFTPServer.Classes
             else
                 dir = Path;
 
-            //if (!dir.EndsWith(Constant.SplitChar)) dir += Constant.SplitChar;
-
-            //if (!Path.StartsWith(Constant.SplitChar)) dir = Constant.SplitChar + dir;
-
             dir = dir.Replace(@"\\", @"\");
             dir = dir.Replace(@"//", @"/");
+
+            if (dir.Contains("/") && !dir.EndsWith("/"))
+            {
+                dir += "/";
+            }
+            else if (dir.Contains(@"\") && !dir.EndsWith(@"\"))
+            {
+                dir += @"\";
+            }
 
             return dir;
         }
@@ -51,6 +56,10 @@ namespace MyFTPServer.Classes
                 }
                 return path;
             }
+            else if (pathParts.Length == 1)
+            {
+                return "/";
+            }
 
             string[] pathParts2 = workingPath.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts2.Length > 1)
@@ -61,6 +70,10 @@ namespace MyFTPServer.Classes
                     path += pathParts2[i] + "\\";
                 }
                 return path;
+            }
+            else if (pathParts2.Length == 1)
+            {
+                return "\\";
             }
 
             return workingPath;

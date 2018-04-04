@@ -159,9 +159,16 @@ namespace AdvancedFTPServer
                             ConnectedUser.CurrentWorkingDirectory = curpath;
                             SendMessage("250 CDUP command successful.\r\n");
                             break;
-                        case "QUIT": SendMessage("221 FTP server signing off\r\n"); Disconnect(); break;
-                        case "PORT": PORT(CmdArguments); break;
-                        case "PASV": PASV(CmdArguments); break;
+                        case "QUIT":
+                            SendMessage("221 FTP server signing off\r\n");
+                            Disconnect();
+                            break;
+                        case "PORT":
+                            PORT(CmdArguments);
+                            break;
+                        case "PASV":
+                            PASV(CmdArguments);
+                            break;
                         case "TYPE": TYPE(CmdArguments); break;
                         case "RETR": RETR(CmdArguments); break;
                         case "STOR": STOR(CmdArguments); break;
@@ -275,8 +282,10 @@ namespace AdvancedFTPServer
             }
             Stream FS = null;
 
-            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments);
-            Path = Path.Substring(0, Path.Length - 1);
+            string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments,ConnectedUser);
+
+            if (Path.EndsWith("/") || Path.EndsWith(@"\"))
+                Path = Path.Substring(0, Path.Length - 1);
 
             try
             {
