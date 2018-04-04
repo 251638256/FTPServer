@@ -87,7 +87,7 @@ namespace AdvancedFTPServer
             catch { Disconnect(); }
 
             LastInteraction = DateTime.Now;
-            string CommandText = Encoding.ASCII.GetString(BufferData, 0, CommandSize).TrimStart(' ');
+            string CommandText = Constant.DefaultEncoding.GetString(BufferData, 0, CommandSize).TrimStart(' ');
             string CmdArguments = null, Command = null;
             int End = 0;
             if ((End = CommandText.IndexOf(' ')) == -1) End = (CommandText = CommandText.Trim()).Length;
@@ -169,27 +169,47 @@ namespace AdvancedFTPServer
                         case "PASV":
                             PASV(CmdArguments);
                             break;
-                        case "TYPE": TYPE(CmdArguments); break;
-                        case "RETR": RETR(CmdArguments); break;
+                        case "TYPE":
+                            TYPE(CmdArguments);
+                            break;
+                        case "RETR":
+                            // 下载文件
+                            RETR(CmdArguments);
+                            break;
                         case "STOR":
                             // 上传文件
                             STOR(CmdArguments);
                             break;
-                        case "APPE": APPE(CmdArguments); break;
-                        case "RNFR": RNFR(CmdArguments); break;
-                        case "RNTO": RNTO(CmdArguments); break;
+                        case "APPE": APPE(CmdArguments);
+                            break;
+                        case "RNFR":
+                            // 重命名
+                            RNFR(CmdArguments);
+                            break;
+                        case "RNTO": RNTO(CmdArguments);
+                            break;
                         case "DELE":
                             // 删除文件
                             DELE(CmdArguments);
                             break;
-                        case "RMD": RMD(CmdArguments); break;
-                        case "MKD": MKD(CmdArguments); break;
+                        case "RMD":
+                            // 重命名文件夹
+                            RMD(CmdArguments);
+                            break;
+                        case "MKD":
+                            // 创建文件夹
+                            MKD(CmdArguments);
+                            break;
 
 
-                        case "NLST": NLST(CmdArguments); break;
-                        case "SYST": SendMessage("215 Windows_NT\r\n"); break;
-                        case "NOOP": SendMessage("200 OK\r\n"); break;
-                        default: SendMessage($"500 Unknown Command.\r\n"); break;
+                        case "NLST": NLST(CmdArguments);
+                            break;
+                        case "SYST": SendMessage("215 Windows_NT\r\n");
+                            break;
+                        case "NOOP": SendMessage("200 OK\r\n");
+                            break;
+                        default: SendMessage($"500 Unknown Command.\r\n");
+                            break;
 
                             //	case "STAT":
                             //		break;
@@ -462,7 +482,8 @@ namespace AdvancedFTPServer
                 SendMessage("550 Access Denied.\r\n");
                 return;
             }
-
+            
+            
             string Path = ConnectedUser.StartUpDirectory + DirectoryHelper.GetExactPath(CmdArguments, ConnectedUser);
 
             if (Directory.Exists(Path) || File.Exists(Path))
@@ -537,7 +558,7 @@ namespace AdvancedFTPServer
                         strFilesList += date + " " + new FileInfo(FileName).Length.ToString() + " " + FileName.Substring(FileName.Replace('\\', '/').LastIndexOf('/') + 1) + "\r\n";
                     }
                 }
-                DataSocket.Send(System.Text.Encoding.Default.GetBytes(strFilesList));
+                DataSocket.Send(Constant.DefaultEncoding.GetBytes(strFilesList));
                 SendMessage("226 Transfer Complete.\r\n");
             }
             catch (DirectoryNotFoundException)
@@ -582,7 +603,7 @@ namespace AdvancedFTPServer
                 {
                     FolderList += Folder.Substring(Folder.Replace('\\', '/').LastIndexOf('/') + 1) + "\r\n";
                 }
-                DataSocket.Send(System.Text.Encoding.Default.GetBytes(FolderList));
+                DataSocket.Send(Constant.DefaultEncoding.GetBytes(FolderList));
                 DataSocket.Shutdown(SocketShutdown.Both);
                 DataSocket.Close();
 
@@ -678,7 +699,7 @@ namespace AdvancedFTPServer
             if (Data == null || Data == string.Empty) return;
             try
             {
-                ClientSocket.Send(Encoding.ASCII.GetBytes(Data));
+                ClientSocket.Send(Constant.DefaultEncoding.GetBytes(Data));
             }
             catch { Disconnect(); }
         }

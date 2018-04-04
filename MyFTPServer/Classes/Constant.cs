@@ -7,10 +7,8 @@ namespace MyFTPServer.Classes
 
     public class Constant
     {
-        public static string SplitChar
-        {
-            get
-            {
+        public static string SplitChar {
+            get {
                 if (IsUnixOrMacOSX)
                 {
                     return "/";
@@ -22,15 +20,20 @@ namespace MyFTPServer.Classes
             }
         }
 
-        public static bool IsUnixOrMacOSX
-        {
-            get
-            {
+        public static bool IsUnixOrMacOSX {
+            get {
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
                 {
                     return true;
                 }
                 return false;
+            }
+        }
+
+        public static Encoding DefaultEncoding {
+            get {
+                //return Encoding.GetEncoding("gbk");
+                return Encoding.UTF8;
             }
         }
 
