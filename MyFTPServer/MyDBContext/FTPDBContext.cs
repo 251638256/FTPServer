@@ -21,7 +21,7 @@ namespace MyFTPServer.MyDBContext
                 DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
 
                 // SQL SERVER
-                dbContextOptionsBuilder.UseSqlServer(home, c =>
+                dbContextOptionsBuilder.UseSqlServer(uoso, c =>
                 {
                     c.UseRowNumberForPaging(false);
                 });

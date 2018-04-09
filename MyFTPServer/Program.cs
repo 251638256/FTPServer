@@ -5,18 +5,19 @@ using Microsoft.EntityFrameworkCore.Extensions;
 using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using MyFTPServer.Classes;
 
 namespace MyFTPServer
 {
     class Program
     {
         private static FTPServer fTPServer;
+        private static MyHTTPServer myHTTPServer;
 
         static void Main(string[] args)
         {
             //Console.WriteLine("Wating...");
             //Console.ReadKey();
-            var instance = FtpDbContext.Instance;
 
             //string curpath = AppDomain.CurrentDomain.BaseDirectory;
             //string configFilePath = Path.Combine(curpath, "mysetting.config");
@@ -46,8 +47,12 @@ namespace MyFTPServer
             //}
             Console.WriteLine("server started , listening port : 21");
 
-            fTPServer = new FTPServer();
-            fTPServer.Start();
+            //var instance = FtpDbContext.Instance;
+            //fTPServer = new FTPServer();
+            //fTPServer.Start();
+
+            myHTTPServer = new MyHTTPServer();
+            myHTTPServer.Start();
 
             Console.WriteLine("Press q or Q to exit this application");
             while (true)
